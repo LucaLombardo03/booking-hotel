@@ -19,10 +19,18 @@ class HotelController extends Controller
         return view('welcome', compact('hotels'));
     }
 
-    public function show($id) {
-        $hotel = Hotel::findOrFail($id);
-        return view('hotel_detail', compact('hotel'));
-    }
+    public function show($id)
+{
+    $hotel = Hotel::findOrFail($id);
+    
+    // Recuperiamo le prenotazioni future per questo hotel
+    $bookedDates = Reservation::where('hotel_id', $id)
+                              ->where('check_out', '>=', now()) // Solo prenotazioni future o in corso
+                              ->orderBy('check_in')
+                              ->get();
+
+    return view('hotel_detail', compact('hotel', 'bookedDates'));
+}
 
     // UTENTE
     public function dashboard() {
@@ -30,19 +38,40 @@ class HotelController extends Controller
         return view('dashboard', compact('reservations'));
     }
 
-    public function storeReservation(Request $request) {
-        $request->validate([
-            'check_in' => 'required|date',
-            'check_out' => 'required|date|after:check_in'
-        ]);
-        Reservation::create([
-            'user_id' => Auth::id(),
-            'hotel_id' => $request->hotel_id,
-            'check_in' => $request->check_in,
-            'check_out' => $request->check_out
-        ]);
-        return redirect()->route('dashboard');
+    public function storeReservation(Request $request)
+{
+    // 1. VALIDAZIONE CON MESSAGGI IN ITALIANO
+    $request->validate([
+        'hotel_id' => 'required|exists:hotels,id',
+        'check_in' => 'required|date|after:today',
+        'check_out' => 'required|date|after:check_in',
+    ], [
+        'check_in.after' => 'Il check-in deve essere una data futura.',
+        'check_out.after' => 'La data di check-out deve essere successiva al check-in.',
+    ]);
+
+    // 2. CONTROLLO SOVRAPPOSIZIONE (Già fatto prima, lascialo così)
+    $exists = Reservation::where('hotel_id', $request->hotel_id)
+        ->where(function ($query) use ($request) {
+            $query->where('check_in', '<', $request->check_out)
+                  ->where('check_out', '>', $request->check_in);
+        })
+        ->exists();
+
+    if ($exists) {
+        return back()->withErrors(['error' => 'Ci dispiace, queste date sono già occupate.']);
     }
+
+    // 3. SALVATAGGIO
+    Reservation::create([
+        'user_id' => Auth::id(),
+        'hotel_id' => $request->hotel_id,
+        'check_in' => $request->check_in,
+        'check_out' => $request->check_out
+    ]);
+
+    return redirect()->route('dashboard')->with('success', 'Prenotazione confermata!');
+}
 
     // ADMIN
     public function adminHome() {
