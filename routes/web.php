@@ -1,11 +1,12 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
 
 Route::get('/', [HotelController::class, 'index'])->name('home');
 Route::get('/hotel/{id}', [HotelController::class, 'show'])->name('hotel.show');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [HotelController::class, 'dashboard'])->name('dashboard');
@@ -17,4 +18,11 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/users', [HotelController::class, 'adminUsers'])->name('admin.users');
     Route::post('/admin/hotel', [HotelController::class, 'storeHotel'])->name('admin.hotel.store');
     Route::delete('/admin/hotel/{id}', [HotelController::class, 'deleteHotel'])->name('admin.hotel.delete');
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/dashboard', [HotelController::class, 'dashboard'])->name('dashboard');
+        Route::post('/reserve', [HotelController::class, 'storeReservation'])->name('reserve');
+
+        // NUOVA ROTTA PER AGGIORNARE IL PROFILO
+        Route::put('/profile/update', [HotelController::class, 'updateProfile'])->name('profile.update');
+    });
 });
