@@ -7,18 +7,23 @@ use App\Models\Hotel;
 use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Hash; // Importante per la password
 
 class HotelController extends Controller
 {
-    // PUBBLICA
+    // --- PARTE PUBBLICA ---
+
     public function index(Request $request)
     {
         $query = Hotel::query();
+
+        // Logica ricerca
         if ($request->has('search')) {
             $s = $request->get('search');
-            $query->where('name', 'LIKE', "%{$s}%")->orWhere('city', 'LIKE', "%{$s}%");
+            $query->where('name', 'LIKE', "%{$s}%")
+                ->orWhere('city', 'LIKE', "%{$s}%");
         }
+
         $hotels = $query->get();
         return view('welcome', compact('hotels'));
     }
@@ -27,19 +32,29 @@ class HotelController extends Controller
     {
         $hotel = Hotel::findOrFail($id);
 
-        // Recuperiamo le prenotazioni future per questo hotel
+        // Recupera le date già prenotate (future) per mostrarle nel calendario/lista
         $bookedDates = Reservation::where('hotel_id', $id)
-            ->where('check_out', '>=', now()) // Solo prenotazioni future o in corso
+            ->where('check_out', '>=', now())
             ->orderBy('check_in')
             ->get();
 
         return view('hotel_detail', compact('hotel', 'bookedDates'));
     }
 
-    // UTENTE
+    // --- PARTE UTENTE LOGGATO ---
+
     public function dashboard()
     {
-        $reservations = Reservation::where('user_id', Auth::id())->with('hotel')->orderBy('check_in', 'desc')->get();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Recupera le prenotazioni dell'utente
+        $reservations = Reservation::where('user_id', $user->id)
+            ->with('hotel')
+            ->orderBy('check_in', 'desc')
+            ->get();
+
+        // Restituisce la vista della dashboard (NON reindirizza alla home)
         return view('dashboard', compact('reservations'));
     }
 
@@ -48,25 +63,19 @@ class HotelController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // 1. Validazione
         $request->validate([
             'name' => 'required|string|max:255',
-            // Controlla che l'email sia unica, MA ignora l'email dell'utente attuale (altrimenti da errore se non la cambi)
             'email' => 'required|email|unique:users,email,' . $user->id,
-            // La password è "nullable" (puoi lasciarla vuota se non vuoi cambiarla)
             'password' => 'nullable|min:8|confirmed',
         ]);
 
-        // 2. Aggiornamento Dati Base
         $user->name = $request->name;
         $user->email = $request->email;
 
-        // 3. Aggiornamento Password (Solo se l'utente ha scritto qualcosa nel campo)
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
-        // 4. Salvataggio nel DB
         $user->save();
 
         return back()->with('success', 'Profilo aggiornato con successo!');
@@ -74,7 +83,7 @@ class HotelController extends Controller
 
     public function storeReservation(Request $request)
     {
-        // 1. VALIDAZIONE CON MESSAGGI IN ITALIANO
+        // 1. Validazione con messaggi in Italiano
         $request->validate([
             'hotel_id' => 'required|exists:hotels,id',
             'check_in' => 'required|date|after:today',
@@ -84,7 +93,7 @@ class HotelController extends Controller
             'check_out.after' => 'La data di check-out deve essere successiva al check-in.',
         ]);
 
-        // 2. CONTROLLO SOVRAPPOSIZIONE (Già fatto prima, lascialo così)
+        // 2. Controllo sovrapposizione date
         $exists = Reservation::where('hotel_id', $request->hotel_id)
             ->where(function ($query) use ($request) {
                 $query->where('check_in', '<', $request->check_out)
@@ -93,10 +102,10 @@ class HotelController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()->withErrors(['error' => 'Ci dispiace, queste date sono già occupate.']);
+            return back()->withErrors(['error' => 'Ci dispiace, queste date sono già occupate per questo hotel.']);
         }
 
-        // 3. SALVATAGGIO
+        // 3. Creazione prenotazione
         Reservation::create([
             'user_id' => Auth::id(),
             'hotel_id' => $request->hotel_id,
@@ -107,7 +116,8 @@ class HotelController extends Controller
         return redirect()->route('dashboard')->with('success', 'Prenotazione confermata!');
     }
 
-    // ADMIN
+    // --- PARTE AMMINISTRATORE ---
+
     public function adminHome()
     {
         $hotels = Hotel::withCount('reservations')->get();
@@ -122,13 +132,19 @@ class HotelController extends Controller
 
     public function storeHotel(Request $request)
     {
+        $request->validate([
+            'name' => 'required',
+            'city' => 'required',
+            'price' => 'required|numeric'
+        ]);
+
         Hotel::create($request->all());
-        return back();
+        return back()->with('success', 'Hotel aggiunto');
     }
 
     public function deleteHotel($id)
     {
         Hotel::destroy($id);
-        return back();
+        return back()->with('success', 'Hotel rimosso');
     }
 }
