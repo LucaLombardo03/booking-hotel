@@ -49,14 +49,20 @@ class HotelController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Recupera le prenotazioni dell'utente
-        $reservations = Reservation::where('user_id', $user->id)
+        // Recupera TUTTE le prenotazioni dell'utente
+        $allReservations = Reservation::where('user_id', $user->id)
             ->with('hotel')
-            ->orderBy('check_in', 'desc')
+            ->orderBy('check_in', 'asc') // Ordine cronologico
             ->get();
 
-        // Restituisce la vista della dashboard (NON reindirizza alla home)
-        return view('dashboard', compact('reservations'));
+        // Separa in due gruppi usando la data di oggi
+        // Attive: Il Check-out è nel futuro (o oggi)
+        $activeReservations = $allReservations->where('check_out', '>=', now()->startOfDay());
+
+        // Passate: Il Check-out è già passato
+        $pastReservations = $allReservations->where('check_out', '<', now()->startOfDay())->sortByDesc('check_in'); // Le passate le ordiniamo dalla più recente
+
+        return view('dashboard', compact('activeReservations', 'pastReservations'));
     }
 
     public function updateProfile(Request $request)
@@ -133,6 +139,25 @@ class HotelController extends Controller
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Prenotazione confermata! Totale pagato: € ' . number_format($totalPrice, 2));
+    }
+
+    public function cancelReservation($id)
+    {
+        // Trova la prenotazione (assicurandoci che sia DELL'UTENTE loggato per sicurezza)
+        $reservation = Reservation::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        // --- TOCCO DI CLASSE: Controllo 24 Ore ---
+        // Calcoliamo la differenza in ore tra ADESSO e il CHECK-IN
+        $hoursUntilCheckIn = now()->diffInHours($reservation->check_in, false); // false serve per avere numeri negativi se è passato
+
+        if ($hoursUntilCheckIn < 24) {
+            return back()->withErrors(['error' => 'Troppo tardi! Puoi cancellare solo fino a 24 ore prima del check-in.']);
+        }
+        // ----------------------------------------
+
+        $reservation->delete();
+
+        return back()->with('success', 'Prenotazione cancellata correttamente.');
     }
 
     // --- PARTE AMMINISTRATORE ---
