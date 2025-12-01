@@ -28,4 +28,8 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     // Rotte per la Modifica
     Route::get('/admin/hotel/{id}/edit', [HotelController::class, 'edit'])->name('admin.hotel.edit');
     Route::put('/admin/hotel/{id}', [HotelController::class, 'update'])->name('admin.hotel.update');
+    // Gestione Utenti da parte dell'Admin
+    Route::get('/admin/users/{id}/edit', [HotelController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/admin/users/{id}', [HotelController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [HotelController::class, 'deleteUser'])->name('admin.users.delete');
 });

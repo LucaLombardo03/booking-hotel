@@ -178,4 +178,50 @@ class HotelController extends Controller
 
         return redirect()->route('admin.home')->with('success', 'Hotel modificato con successo!');
     }
+
+    // --- GESTIONE UTENTI (ADMIN) ---
+
+    // 1. Mostra il form di modifica utente
+    public function editUser($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.user_edit', compact('user'));
+    }
+
+    // 2. Salva le modifiche all'utente
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            // Ignora l'email dell'utente attuale nel controllo unique
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|min:8', // Password opzionale
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        // Aggiorna la password SOLO se è stata scritta
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users')->with('success', 'Utente aggiornato con successo!');
+    }
+
+    // 3. Elimina l'utente
+    public function deleteUser($id)
+    {
+        // Impedisci all'admin di cancellarsi da solo!
+        if (Auth::id() == $id) {
+            return back()->withErrors(['error' => 'Non puoi cancellare te stesso!']);
+        }
+
+        User::destroy($id);
+        return back()->with('success', 'Utente eliminato.');
+    }
 }
