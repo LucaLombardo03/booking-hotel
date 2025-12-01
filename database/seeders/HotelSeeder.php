@@ -36,6 +36,7 @@ class HotelSeeder extends Seeder
             'house_number' => '10',
             'zip_code' => '80100',
             'price' => 90.00,
+            'tourist_tax' => 2.50,
             'description' => 'Goditi il sole e il mare in questo splendido resort con piscina.'
         ]);
     }

@@ -17,8 +17,7 @@
             <form action="{{ route('admin.hotel.store') }}" method="POST">
                 @csrf
 
-                <div
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label class="input-label">Nome Hotel</label>
                         <input type="text" name="name" placeholder="Es. Grand Hotel" required
@@ -27,6 +26,11 @@
                     <div>
                         <label class="input-label">Prezzo (€)</label>
                         <input type="number" name="price" placeholder="Es. 120" required class="modern-input">
+                    </div>
+                    <div>
+                        <label class="input-label">Tassa Soggiorno (€)</label>
+                        <input type="number" step="0.50" name="tourist_tax" placeholder="Es. 2.50"
+                            class="modern-input">
                     </div>
                 </div>
 

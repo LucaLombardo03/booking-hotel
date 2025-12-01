@@ -37,6 +37,12 @@
                             style="display: block; font-size: 0.85rem; text-transform: uppercase; color: #a0aec0; font-weight: bold; letter-spacing: 0.05em;">Prezzo
                             a notte</span>
                         <span style="color: #27ae60; font-weight: 900; font-size: 2rem;">€ {{ $hotel->price }}</span>
+
+                        @if ($hotel->tourist_tax > 0)
+                            <div style="font-size: 0.8rem; color: #718096; margin-top: 5px; font-weight: 600;">
+                                + € {{ number_format($hotel->tourist_tax, 2) }} tassa soggiorno
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

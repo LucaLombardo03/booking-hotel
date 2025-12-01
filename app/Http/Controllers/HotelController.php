@@ -137,13 +137,14 @@ class HotelController extends Controller
             'city' => 'required',
             'street' => 'required',
             'house_number' => 'required',
-            'zip_code' => 'required|numeric', // Controllo che il CAP sia numerico
-            'price' => 'required|numeric'
+            'zip_code' => 'required',
+            'price' => 'required|numeric',
+            // Validazione: deve essere numero, ma è opzionale (nullable)
+            'tourist_tax' => 'nullable|numeric|min:0'
         ]);
 
         Hotel::create($request->all());
-
-        return back()->with('success', 'Hotel aggiunto con indirizzo completo!');
+        return back()->with('success', 'Hotel aggiunto');
     }
 
     public function deleteHotel($id)
@@ -169,14 +170,14 @@ class HotelController extends Controller
             'city' => 'required',
             'street' => 'required',
             'house_number' => 'required',
-            'zip_code' => 'required|numeric',
-            'price' => 'required|numeric'
+            'zip_code' => 'required',
+            'price' => 'required|numeric',
+            // Aggiungi anche qui
+            'tourist_tax' => 'nullable|numeric|min:0'
         ]);
 
-        // Aggiorna tutti i campi
         $hotel->update($request->all());
-
-        return redirect()->route('admin.home')->with('success', 'Hotel modificato con successo!');
+        return redirect()->route('admin.home')->with('success', 'Hotel modificato!');
     }
 
     // --- GESTIONE UTENTI (ADMIN) ---

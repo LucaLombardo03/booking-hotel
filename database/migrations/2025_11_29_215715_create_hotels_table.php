@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('house_number');  // Numero Civico
             $table->string('zip_code');      // CAP
             // -----------------------------
-
+            $table->decimal('tourist_tax', 8, 2)->nullable(); //Tassa di soggiorno
             $table->decimal('price', 8, 2);
             $table->text('description')->nullable();
             $table->timestamps();

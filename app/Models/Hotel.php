@@ -13,6 +13,7 @@ class Hotel extends Model
         'house_number',
         'zip_code',
         'price',
+        'tourist_tax',
         'description'
     ];
 
