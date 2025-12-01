@@ -74,8 +74,15 @@
                                 <span
                                     style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #a0aec0; letter-spacing: 0.05em; font-weight: bold;">Prezzo
                                     a notte</span>
+
                                 <span style="color: #27ae60; font-weight: 900; font-size: 1.5rem;">€
                                     {{ $hotel->price }}</span>
+
+                                @if ($hotel->tourist_tax > 0)
+                                    <div style="font-size: 0.7rem; color: #a0aec0; margin-top: 2px;">
+                                        + € {{ number_format($hotel->tourist_tax, 2) }} tassa
+                                    </div>
+                                @endif
                             </div>
 
                             <a href="{{ route('hotel.show', $hotel->id) }}" class="btn-detail"
@@ -87,19 +94,19 @@
                     </div>
                 @endforeach
             </div>
+
+            <div style="margin-top: 50px; display: flex; justify-content: center;">
+                {{ $hotels->withQueryString()->links() }}
+            </div>
+
         @endif
     </div>
 
     <style>
-        .hotel-card {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .hotel-card:hover {
-            transform: translateY(-8px);
-            /* La card si alza */
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: #bee3f8;
+        /* --- Stili Generali e Card --- */
+        input:focus {
+            border-color: #3182ce !important;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
         }
 
         .btn:hover {
@@ -111,9 +118,72 @@
             box-shadow: 0 6px 8px rgba(44, 82, 130, 0.3) !important;
         }
 
-        input:focus {
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
-            /* Alone blu quando scrivi */
+        .hotel-card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #bee3f8;
+        }
+
+        a:hover {
+            color: #3182ce !important;
+        }
+
+        /* --- NUOVI STILI PER LA PAGINAZIONE --- */
+
+        /* 1. Nasconde il testo "Showing..." */
+        nav .small.text-muted {
+            display: none !important;
+        }
+
+        /* 2. Centra i numeri */
+        .pagination {
+            justify-content: center;
+            margin: 0;
+            /* Rimuove margini extra */
+        }
+
+        /* 3. Stile dei link (numeri e frecce) */
+        .page-link {
+            color: #3182ce;
+            /* Blu del sito */
+            border: none;
+            /* Nessun bordo standard */
+            background-color: transparent;
+            font-weight: bold;
+            padding: 10px 16px;
+            border-radius: 50% !important;
+            /* Cerchio perfetto */
+            margin: 0 4px;
+            /* Spazio tra i cerchi */
+            transition: all 0.3s ease;
+        }
+
+        /* 4. Hover sui link */
+        .page-link:hover {
+            color: #2c5282;
+            /* Blu più scuro */
+            background-color: #ebf8ff;
+            /* Sfondo azzurrino */
+        }
+
+        /* 5. Stile della pagina ATTIVA */
+        .page-item.active .page-link {
+            background-color: #3182ce;
+            /* Sfondo blu pieno */
+            color: white;
+            box-shadow: 0 4px 6px rgba(49, 130, 206, 0.3);
+            /* Ombretta */
+        }
+
+        /* 6. Stile per i bottoni disabilitati */
+        .page-item.disabled .page-link {
+            color: #a0aec0;
+            /* Grigio chiaro */
+            background-color: transparent;
         }
     </style>
 </x-app-layout>

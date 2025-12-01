@@ -24,7 +24,8 @@ class HotelController extends Controller
                 ->orWhere('city', 'LIKE', "%{$s}%");
         }
 
-        $hotels = $query->get();
+        $hotels = $query->paginate(6);
+
         return view('welcome', compact('hotels'));
     }
 
