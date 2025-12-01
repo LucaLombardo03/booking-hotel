@@ -1,55 +1,65 @@
 <x-app-layout>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1>👥 Gestione Utenti</h1>
-            <a href="{{ route('admin.home') }}" style="color: #3498db; text-decoration: none;">&larr; Torna alla
-                Dashboard</a>
+    <div style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1 style="font-size: 2rem; font-weight: 800; color: #1a202c; margin: 0;">Gestione Utenti</h1>
+            <a href="{{ route('admin.home') }}" style="color: #718096; text-decoration: none; font-weight: bold;">&larr;
+                Torna alla Dashboard</a>
         </div>
 
-        <div class="card">
+        <div
+            style="background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 30px; border: 1px solid #edf2f7;">
+
             @if ($users->isEmpty())
                 <p>Nessun utente registrato.</p>
             @else
-                <table>
+                <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr style="background-color: #f8f9fa;">
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Ruolo</th>
-                            <th>Iscritto il</th>
-                            <th>Azioni</th>
+                        <tr style="border-bottom: 2px solid #edf2f7;">
+                            <th
+                                style="text-align: left; padding: 15px; color: #718096; font-size: 0.85rem; text-transform: uppercase;">
+                                Utente</th>
+                            <th
+                                style="text-align: left; padding: 15px; color: #718096; font-size: 0.85rem; text-transform: uppercase;">
+                                Ruolo</th>
+                            <th
+                                style="text-align: left; padding: 15px; color: #718096; font-size: 0.85rem; text-transform: uppercase;">
+                                Registrato il</th>
+                            <th
+                                style="text-align: right; padding: 15px; color: #718096; font-size: 0.85rem; text-transform: uppercase;">
+                                Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($users as $user)
-                            <tr>
-                                <td>{{ $user->id }}</td>
-                                <td style="font-weight: bold;">{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>
+                            <tr style="border-bottom: 1px solid #edf2f7;">
+                                <td style="padding: 15px;">
+                                    <div style="font-weight: bold; color: #2d3748;">{{ $user->name }}</div>
+                                    <div style="font-size: 0.9rem; color: #718096;">{{ $user->email }}</div>
+                                </td>
+                                <td style="padding: 15px;">
                                     @if ($user->role === 'admin')
                                         <span
-                                            style="background-color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; font-weight: bold;">ADMIN</span>
+                                            style="background: #2d3748; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">ADMIN</span>
                                     @else
-                                        <span style="color: #666;">User</span>
+                                        <span
+                                            style="background: #edf2f7; color: #4a5568; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">USER</span>
                                     @endif
                                 </td>
-                                <td>{{ $user->created_at->format('d/m/Y') }}</td>
-                                <td>
-                                    <div style="display: flex; gap: 5px;">
-                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn"
-                                            style="background: #f39c12; padding: 5px 10px; font-size: 0.8em; color: white; border-radius: 4px;">
-                                            Modifica
-                                        </a>
+                                <td style="padding: 15px; color: #4a5568;">
+                                    {{ $user->created_at->format('d/m/Y') }}
+                                </td>
+                                <td style="padding: 15px; text-align: right;">
+                                    <div style="display: inline-flex; gap: 8px;">
+                                        <a href="{{ route('admin.users.edit', $user->id) }}"
+                                            style="background: #ecc94b; color: #744210; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; text-decoration: none;">Modifica</a>
 
                                         @if (Auth::id() !== $user->id)
                                             <form action="{{ route('admin.users.delete', $user->id) }}" method="POST"
-                                                onsubmit="return confirm('Sei sicuro di voler eliminare questo utente? Verranno cancellate anche le sue prenotazioni.');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn"
-                                                    style="background: #e74c3c; padding: 5px 10px; font-size: 0.8em; margin: 0;">Elimina</button>
+                                                onsubmit="return confirm('Sicuro?');">
+                                                @csrf @method('DELETE')
+                                                <button
+                                                    style="background: #fc8181; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; border: none; cursor: pointer;">Elimina</button>
                                             </form>
                                         @endif
                                     </div>

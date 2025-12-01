@@ -17,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/reserve', [HotelController::class, 'storeReservation'])->name('reserve');
     Route::put('/profile/update', [HotelController::class, 'updateProfile'])->name('profile.update');
+    Route::delete('/profile/destroy', [HotelController::class, 'destroyProfile'])->name('profile.destroy');
 });
 
 // 4. ADMIN

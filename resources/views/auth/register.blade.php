@@ -1,58 +1,76 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+    <div style="max-width: 450px; margin: 0 auto; padding-top: 40px; padding-bottom: 40px;">
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 2rem; font-weight: 800; color: #2d3748; margin: 0;">Benvenuto! 👋</h1>
+            <p style="color: #718096; margin-top: 10px;">Crea un account per iniziare a prenotare.</p>
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div
+            style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
+
+                <div style="margin-bottom: 20px;">
+                    <label
+                        style="display: block; font-weight: bold; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Nome
+                        Completo</label>
+                    <input type="text" name="name" value="{{ old('name') }}" required autofocus
+                        autocomplete="name"
+                        style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; color: #2d3748; font-size: 1rem; box-sizing: border-box;">
+                    <x-input-error :messages="$errors->get('name')" style="color: #e53e3e; font-size: 0.85rem; margin-top: 5px;" />
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label
+                        style="display: block; font-weight: bold; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required autocomplete="username"
+                        style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; color: #2d3748; font-size: 1rem; box-sizing: border-box;">
+                    <x-input-error :messages="$errors->get('email')" style="color: #e53e3e; font-size: 0.85rem; margin-top: 5px;" />
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label
+                        style="display: block; font-weight: bold; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Password</label>
+                    <input type="password" name="password" required autocomplete="new-password"
+                        style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; color: #2d3748; font-size: 1rem; box-sizing: border-box;">
+                    <x-input-error :messages="$errors->get('password')" style="color: #e53e3e; font-size: 0.85rem; margin-top: 5px;" />
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <label
+                        style="display: block; font-weight: bold; color: #4a5568; margin-bottom: 8px; font-size: 0.9rem;">Conferma
+                        Password</label>
+                    <input type="password" name="password_confirmation" required autocomplete="new-password"
+                        style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; color: #2d3748; font-size: 1rem; box-sizing: border-box;">
+                    <x-input-error :messages="$errors->get('password_confirmation')" style="color: #e53e3e; font-size: 0.85rem; margin-top: 5px;" />
+                </div>
+
+                <button
+                    style="width: 100%; background: #2d3748; color: white; padding: 15px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; transition: background 0.2s;">
+                    Registrati
+                </button>
+
+                <div style="text-align: center; margin-top: 25px; font-size: 0.9rem; color: #718096;">
+                    Hai già un account? <a href="{{ route('login') }}"
+                        style="color: #3182ce; font-weight: bold; text-decoration: none;">Accedi qui</a>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+    <style>
+        input:focus {
+            border-color: #3182ce !important;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+        button:hover {
+            background-color: #1a202c !important;
+        }
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-            @if (Route::has('password.request'))
-                <a href="{{ route('login') }}"
-                    style="font-size: 0.9em; color: #3498db; text-decoration: none;">
-                     {{ __('Already registered?') }}
-                </a>
-            @endif
-
-            <button type="submit" class="btn"
-                style="background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
-                {{ __('Register') }}
-            </button>
-        </div>
-        </div>
-    </form>
+        a:hover {
+            text-decoration: underline !important;
+        }
+    </style>
 </x-guest-layout>

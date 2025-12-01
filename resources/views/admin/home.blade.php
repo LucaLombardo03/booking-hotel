@@ -1,102 +1,106 @@
 <x-app-layout>
-    <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <h1>Admin Dashboard</h1>
-            <a href="{{ route('admin.users') }}" class="btn" style="background-color: #6c757d;">Gestisci Utenti</a>
+    <div style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: #1a202c; margin: 0;">Dashboard Admin</h1>
+                <p style="color: #718096; margin-top: 5px;">Gestisci strutture e contenuti.</p>
+            </div>
+            <a href="{{ route('admin.users') }}" class="btn-secondary">
+                👥 Gestisci Utenti
+            </a>
         </div>
 
-        <!-- FORM DI AGGIUNTA HOTEL -->
-        <div class="card" style="margin-bottom: 30px;">
-            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Aggiungi Nuovo Hotel
-            </h3>
+        <div class="admin-card" style="margin-bottom: 40px;">
+            <h3 class="card-title">🏨 Aggiungi Nuovo Hotel</h3>
 
             <form action="{{ route('admin.hotel.store') }}" method="POST">
                 @csrf
 
-                <!-- RIGA 1: Nome e Prezzo -->
-                <div style="display:flex; gap: 15px; margin-bottom: 15px;">
-                    <div style="flex: 3;">
-                        <label style="font-weight: bold; font-size: 0.9em;">Nome Hotel</label>
-                        <input type="text" name="name" placeholder="Es. Hotel Roma" required>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label class="input-label">Nome Hotel</label>
+                        <input type="text" name="name" placeholder="Es. Grand Hotel" required
+                            class="modern-input">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-weight: bold; font-size: 0.9em;">Prezzo per notte (€)</label>
-                        <input type="number" name="price" placeholder="Es. 80" required>
-                    </div>
-                </div>
-
-                <!-- RIGA 2: Indirizzo (Via e Civico) -->
-                <div style="display:flex; gap: 15px; margin-bottom: 15px;">
-                    <div style="flex: 3;">
-                        <label style="font-weight: bold; font-size: 0.9em;">Via / Piazza</label>
-                        <input type="text" name="street" placeholder="Es. Via Garibaldi" required>
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-weight: bold; font-size: 0.9em;">N. Civico</label>
-                        <input type="text" name="house_number" placeholder="Es. 42/B" required>
+                    <div>
+                        <label class="input-label">Prezzo (€)</label>
+                        <input type="number" name="price" placeholder="Es. 120" required class="modern-input">
                     </div>
                 </div>
 
-                <!-- RIGA 3: Città e CAP -->
-                <div style="display:flex; gap: 15px; margin-bottom: 15px;">
-                    <div style="flex: 3;">
-                        <label style="font-weight: bold; font-size: 0.9em;">Città</label>
-                        <input type="text" name="city" placeholder="Es. Milano" required>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label class="input-label">Via / Piazza</label>
+                        <input type="text" name="street" placeholder="Es. Via Roma" required class="modern-input">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-weight: bold; font-size: 0.9em;">CAP</label>
-                        <input type="text" name="zip_code" placeholder="Es. 20100" required>
+                    <div>
+                        <label class="input-label">N. Civico</label>
+                        <input type="text" name="house_number" placeholder="10" required class="modern-input">
                     </div>
                 </div>
 
-                <!-- Descrizione -->
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: bold; font-size: 0.9em;">Descrizione</label>
-                    <textarea name="description" placeholder="Inserisci una descrizione dell'hotel..." style="height: 80px;"></textarea>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label class="input-label">Città</label>
+                        <input type="text" name="city" placeholder="Milano" required class="modern-input">
+                    </div>
+                    <div>
+                        <label class="input-label">CAP</label>
+                        <input type="text" name="zip_code" placeholder="20100" required class="modern-input">
+                    </div>
                 </div>
 
-                <button class="btn" style="background-color: #27ae60; width: 100%;">Salva Hotel</button>
+                <div style="margin-bottom: 25px;">
+                    <label class="input-label">Descrizione</label>
+                    <textarea name="description" placeholder="Descrivi la struttura..." class="modern-input"
+                        style="height: 100px; resize: vertical;"></textarea>
+                </div>
+
+                <div style="text-align: right;">
+                    <button class="btn-primary">Salva Struttura</button>
+                </div>
             </form>
         </div>
 
-        <!-- LISTA HOTEL ESISTENTI -->
-        <div class="card">
-            <h3>Lista Hotel</h3>
+        <div class="admin-card">
+            <h3 class="card-title">📋 Lista Hotel Attivi</h3>
+
             @if ($hotels->isEmpty())
-                <p>Nessun hotel inserito.</p>
+                <p style="color: #a0aec0; text-align: center; padding: 20px;">Nessun hotel presente.</p>
             @else
-                <table>
+                <table class="admin-table">
                     <thead>
-                        <tr style="background-color: #f8f9fa;">
+                        <tr>
                             <th>Nome</th>
-                            <th>Indirizzo</th> <!-- Ho unito Città e Via qui per compattezza -->
+                            <th>Località</th>
                             <th>Prenotazioni</th>
-                            <th>Azioni</th>
+                            <th style="text-align: right;">Azioni</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($hotels as $hotel)
                             <tr>
-                                <td style="font-weight: bold;">{{ $hotel->name }}</td>
-                                <td>
-                                    {{ $hotel->city }} ({{ $hotel->zip_code }})<br>
-                                    <span style="font-size: 0.8em; color: #666;">{{ $hotel->street }},
-                                        {{ $hotel->house_number }}</span>
+                                <td style="font-weight: bold; color: #2d3748;">{{ $hotel->name }}</td>
+                                <td style="color: #718096;">
+                                    {{ $hotel->city }} <span style="font-size: 0.8em;">({{ $hotel->street }})</span>
                                 </td>
-                                <td>{{ $hotel->reservations_count }}</td>
                                 <td>
-                                    <div style="display: flex; gap: 5px;">
-                                        <a href="{{ route('admin.hotel.edit', $hotel->id) }}" class="btn"
-                                            style="background: #f39c12; padding: 5px 10px; font-size: 0.8em; text-decoration: none; color: white; border-radius: 4px;">
-                                            Modifica
-                                        </a>
+                                    <span
+                                        style="background: #ebf8ff; color: #2b6cb0; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
+                                        {{ $hotel->reservations_count }}
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <div style="display: inline-flex; gap: 8px;">
+                                        <a href="{{ route('admin.hotel.edit', $hotel->id) }}"
+                                            class="action-btn btn-edit">Modifica</a>
 
                                         <form action="{{ route('admin.hotel.delete', $hotel->id) }}" method="POST"
-                                            onsubmit="return confirm('Sei sicuro?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn"
-                                                style="background: #e74c3c; padding: 5px 10px; font-size: 0.8em; margin: 0;">Elimina</button>
+                                            onsubmit="return confirm('Sicuro?');">
+                                            @csrf @method('DELETE')
+                                            <button class="action-btn btn-delete">Elimina</button>
                                         </form>
                                     </div>
                                 </td>
@@ -107,4 +111,130 @@
             @endif
         </div>
     </div>
+
+    <style>
+        .admin-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border: 1px solid #edf2f7;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f7fafc;
+            padding-bottom: 15px;
+        }
+
+        .modern-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.2s;
+            color: #4a5568;
+        }
+
+        .modern-input:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .input-label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #3182ce;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #2c5282;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
+        /* Tabella */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            text-align: left;
+            padding: 15px;
+            color: #718096;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .admin-table td {
+            padding: 15px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-edit {
+            background: #ecc94b;
+            color: #744210;
+        }
+
+        .btn-edit:hover {
+            background: #d69e2e;
+        }
+
+        .btn-delete {
+            background: #fc8181;
+            color: #742a2a;
+        }
+
+        .btn-delete:hover {
+            background: #e53e3e;
+            color: white;
+        }
+    </style>
 </x-app-layout>
