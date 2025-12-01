@@ -151,4 +151,31 @@ class HotelController extends Controller
         Hotel::destroy($id);
         return back()->with('success', 'Hotel rimosso');
     }
+
+    // 1. Mostra il form di modifica con i dati già inseriti
+    public function edit($id)
+    {
+        $hotel = Hotel::findOrFail($id);
+        return view('admin.edit', compact('hotel'));
+    }
+
+    // 2. Salva le modifiche
+    public function update(Request $request, $id)
+    {
+        $hotel = Hotel::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required',
+            'city' => 'required',
+            'street' => 'required',
+            'house_number' => 'required',
+            'zip_code' => 'required|numeric',
+            'price' => 'required|numeric'
+        ]);
+
+        // Aggiorna tutti i campi
+        $hotel->update($request->all());
+
+        return redirect()->route('admin.home')->with('success', 'Hotel modificato con successo!');
+    }
 }

@@ -85,13 +85,20 @@
                                 </td>
                                 <td>{{ $hotel->reservations_count }}</td>
                                 <td>
-                                    <form action="{{ route('admin.hotel.delete', $hotel->id) }}" method="POST"
-                                        onsubmit="return confirm('Sei sicuro di voler eliminare questo hotel?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn"
-                                            style="background: #e74c3c; padding: 5px 10px; font-size: 0.8em;">Elimina</button>
-                                    </form>
+                                    <div style="display: flex; gap: 5px;">
+                                        <a href="{{ route('admin.hotel.edit', $hotel->id) }}" class="btn"
+                                            style="background: #f39c12; padding: 5px 10px; font-size: 0.8em; text-decoration: none; color: white; border-radius: 4px;">
+                                            Modifica
+                                        </a>
+
+                                        <form action="{{ route('admin.hotel.delete', $hotel->id) }}" method="POST"
+                                            onsubmit="return confirm('Sei sicuro?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn"
+                                                style="background: #e74c3c; padding: 5px 10px; font-size: 0.8em; margin: 0;">Elimina</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

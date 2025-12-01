@@ -25,4 +25,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/users', [HotelController::class, 'adminUsers'])->name('admin.users');
     Route::post('/admin/hotel', [HotelController::class, 'storeHotel'])->name('admin.hotel.store');
     Route::delete('/admin/hotel/{id}', [HotelController::class, 'deleteHotel'])->name('admin.hotel.delete');
+    // Rotte per la Modifica
+    Route::get('/admin/hotel/{id}/edit', [HotelController::class, 'edit'])->name('admin.hotel.edit');
+    Route::put('/admin/hotel/{id}', [HotelController::class, 'update'])->name('admin.hotel.update');
 });
