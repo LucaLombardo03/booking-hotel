@@ -17,9 +17,9 @@ class HotelController extends Controller
     {
         $query = Hotel::query();
 
-        // Logica ricerca
-        if ($request->has('search')) {
+        if ($request->has('search') && $request->search != '') {
             $s = $request->get('search');
+            // Cerca se la stringa è contenuta nel NOME oppure nella CITTÀ
             $query->where('name', 'LIKE', "%{$s}%")
                 ->orWhere('city', 'LIKE', "%{$s}%");
         }
@@ -135,11 +135,15 @@ class HotelController extends Controller
         $request->validate([
             'name' => 'required',
             'city' => 'required',
+            'street' => 'required',
+            'house_number' => 'required',
+            'zip_code' => 'required|numeric', // Controllo che il CAP sia numerico
             'price' => 'required|numeric'
         ]);
 
         Hotel::create($request->all());
-        return back()->with('success', 'Hotel aggiunto');
+
+        return back()->with('success', 'Hotel aggiunto con indirizzo completo!');
     }
 
     public function deleteHotel($id)

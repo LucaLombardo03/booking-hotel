@@ -14,7 +14,14 @@ return new class extends Migration
         Schema::create('hotels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('city');
+
+            // --- NUOVI CAMPI INDIRIZZO ---
+            $table->string('city');          // Città (Già c'era, ma fondamentale per i filtri)
+            $table->string('street');        // Via
+            $table->string('house_number');  // Numero Civico
+            $table->string('zip_code');      // CAP
+            // -----------------------------
+
             $table->decimal('price', 8, 2);
             $table->text('description')->nullable();
             $table->timestamps();

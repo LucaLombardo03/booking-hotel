@@ -2,10 +2,15 @@
     <div
         style="max-width: 800px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 
-        <h1 style="font-size: 2.5em; margin-bottom: 10px;">{{ $hotel->name }}</h1>
-        <h3 style="color: #7f8c8d; margin-bottom: 20px;">
-            📍 {{ $hotel->city }} &nbsp;|&nbsp;
-            <span style="color: #27ae60; font-weight: bold;">€ {{ $hotel->price }} / notte</span>
+        <h1 style="font-size: 2.5em; margin-bottom: 5px;">{{ $hotel->name }}</h1>
+
+        <div style="color: #7f8c8d; margin-bottom: 15px; font-size: 1.1em; line-height: 1.4;">
+            📍 {{ $hotel->street }}, {{ $hotel->house_number }}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp; {{ $hotel->zip_code }} - {{ $hotel->city }}
+        </div>
+
+        <h3 style="color: #27ae60; font-weight: bold; margin-bottom: 20px; font-size: 1.4em;">
+            € {{ $hotel->price }} <span style="font-size: 0.6em; color: #666; font-weight: normal;">/ notte</span>
         </h3>
 
         <div style="line-height: 1.6; color: #333; margin-bottom: 30px;">
@@ -21,7 +26,8 @@
                 <ul style="color: #c53030; list-style: circle; margin-left: 20px;">
                     @foreach ($bookedDates as $booking)
                         <li>Dal <strong>{{ $booking->check_in->format('d/m/Y') }}</strong> al
-                            <strong>{{ $booking->check_out->format('d/m/Y') }}</strong></li>
+                            <strong>{{ $booking->check_out->format('d/m/Y') }}</strong>
+                        </li>
                     @endforeach
                 </ul>
             </div>
@@ -79,17 +85,12 @@
     </div>
 
     <script>
-        // Prende gli elementi dal DOM
         const checkInInput = document.getElementById('check_in');
         const checkOutInput = document.getElementById('check_out');
 
         if (checkInInput && checkOutInput) {
-            // Quando cambi la data di Check-in
             checkInInput.addEventListener('change', function() {
-                // Imposta la data minima del Check-out uguale alla data scelta per il Check-in
                 checkOutInput.min = this.value;
-
-                // Se la data di check-out attuale è precedente al nuovo check-in, la resetta
                 if (checkOutInput.value && checkOutInput.value < this.value) {
                     checkOutInput.value = this.value;
                 }
