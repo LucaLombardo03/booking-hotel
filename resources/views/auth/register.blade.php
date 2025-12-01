@@ -40,13 +40,19 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+            @if (Route::has('password.request'))
+                <a href="{{ route('login') }}"
+                    style="font-size: 0.9em; color: #3498db; text-decoration: none;">
+                     {{ __('Already registered?') }}
+                </a>
+            @endif
 
-            <x-primary-button class="ms-4">
+            <button type="submit" class="btn"
+                style="background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
                 {{ __('Register') }}
-            </x-primary-button>
+            </button>
+        </div>
         </div>
     </form>
 </x-guest-layout>
