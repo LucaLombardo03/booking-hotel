@@ -1,88 +1,154 @@
 <x-app-layout>
-    <div
-        style="max-width: 800px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="max-width: 900px; margin: 50px auto; padding: 0 20px;">
 
-        <h1 style="font-size: 2.5em; margin-bottom: 5px;">{{ $hotel->name }}</h1>
-
-        <div style="color: #7f8c8d; margin-bottom: 15px; font-size: 1.1em; line-height: 1.4;">
-            📍 {{ $hotel->street }}, {{ $hotel->house_number }}<br>
-            &nbsp;&nbsp;&nbsp;&nbsp; {{ $hotel->zip_code }} - {{ $hotel->city }}
+        <div style="margin-bottom: 20px;">
+            <a href="{{ route('home') }}"
+                style="display: inline-flex; align-items: center; color: #718096; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: color 0.2s;">
+                &larr; Torna alla lista
+            </a>
         </div>
 
-        <h3 style="color: #27ae60; font-weight: bold; margin-bottom: 20px; font-size: 1.4em;">
-            € {{ $hotel->price }} <span style="font-size: 0.6em; color: #666; font-weight: normal;">/ notte</span>
-        </h3>
+        <div class="detail-card"
+            style="background: white; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); overflow: hidden;">
 
-        <div style="line-height: 1.6; color: #333; margin-bottom: 30px;">
-            <p>{{ $hotel->description }}</p>
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
-
-        @if (isset($bookedDates) && $bookedDates->count() > 0)
-            <div
-                style="background-color: #fff5f5; border: 1px solid #feb2b2; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <h4 style="color: #c53030; margin-top: 0;">📅 Date NON disponibili:</h4>
-                <ul style="color: #c53030; list-style: circle; margin-left: 20px;">
-                    @foreach ($bookedDates as $booking)
-                        <li>Dal <strong>{{ $booking->check_in->format('d/m/Y') }}</strong> al
-                            <strong>{{ $booking->check_out->format('d/m/Y') }}</strong>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @auth
-            @if ($errors->any())
+            <div style="padding: 40px 40px 20px 40px; border-bottom: 1px solid #edf2f7;">
                 <div
-                    style="background-color: #c53030; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+                    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
 
-            <h3 style="margin-bottom: 15px;">Prenota il tuo soggiorno</h3>
-
-            <form action="{{ route('reserve') }}" method="POST"
-                style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
-                @csrf
-                <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
-
-                <div style="display: flex; gap: 20px; margin-bottom: 15px;">
                     <div style="flex: 1;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Data Check-in</label>
-                        <input type="date" name="check_in" id="check_in" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <h1
+                            style="font-size: 2.5rem; font-weight: 800; color: #1a202c; margin: 0; line-height: 1.1; margin-bottom: 15px;">
+                            {{ $hotel->name }}
+                        </h1>
+
+                        <div style="color: #718096; font-size: 1.1rem; line-height: 1.6;">
+                            <span
+                                style="display: inline-block; background: #ebf8ff; color: #2b6cb0; padding: 6px 14px; border-radius: 50px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+                                {{ $hotel->city }}
+                            </span>
+                            <br>
+                            📍 {{ $hotel->street }}, {{ $hotel->house_number }} <span style="color: #a0aec0;">—
+                                {{ $hotel->zip_code }}</span>
+                        </div>
                     </div>
-                    <div style="flex: 1;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Data Check-out</label>
-                        <input type="date" name="check_out" id="check_out" required
-                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+
+                    <div style="text-align: right; background: #f7fafc; padding: 15px 25px; border-radius: 16px;">
+                        <span
+                            style="display: block; font-size: 0.85rem; text-transform: uppercase; color: #a0aec0; font-weight: bold; letter-spacing: 0.05em;">Prezzo
+                            a notte</span>
+                        <span style="color: #27ae60; font-weight: 900; font-size: 2rem;">€ {{ $hotel->price }}</span>
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-green"
-                    style="width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    ✅ Conferma Prenotazione
-                </button>
-            </form>
-        @else
-            <div
-                style="text-align: center; padding: 20px; background-color: #fff3cd; color: #856404; border-radius: 8px; border: 1px solid #ffeeba;">
-                Devi prima effettuare il <a href="{{ route('login') }}"
-                    style="text-decoration: underline; font-weight: bold; color: #856404;">Login</a> per prenotare.
             </div>
-        @endauth
 
-        <div style="margin-top: 20px;">
-            <a href="{{ route('home') }}" style="color: #3498db; text-decoration: none;">&larr; Torna alla lista
-                hotel</a>
+            <div style="padding: 30px 40px; line-height: 1.8; color: #4a5568; font-size: 1.1rem;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #2d3748; margin-bottom: 10px;">Descrizione</h3>
+                <p>{{ $hotel->description }}</p>
+            </div>
+
+            <div style="background-color: #f8fafc; padding: 40px; border-top: 1px solid #edf2f7;">
+
+                @if (isset($bookedDates) && $bookedDates->count() > 0)
+                    <div
+                        style="background-color: #fff5f5; border: 1px solid #feb2b2; padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 1.5rem; margin-right: 10px;">📅</span>
+                            <h4 style="color: #c53030; margin: 0; font-weight: 800; font-size: 1.1rem;">Date NON
+                                disponibili</h4>
+                        </div>
+                        <ul
+                            style="color: #c53030; list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px;">
+                            @foreach ($bookedDates as $booking)
+                                <li
+                                    style="background: white; padding: 5px 12px; border-radius: 6px; border: 1px solid #fc8181; font-size: 0.9rem;">
+                                    Dal <strong>{{ $booking->check_in->format('d/m') }}</strong> al
+                                    <strong>{{ $booking->check_out->format('d/m') }}</strong>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @auth
+                    <div
+                        style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+                        <h3
+                            style="margin-top: 0; margin-bottom: 20px; font-weight: 800; color: #2d3748; font-size: 1.4rem;">
+                            Prenota il tuo soggiorno
+                        </h3>
+
+                        @if ($errors->any())
+                            <div
+                                style="background-color: #c53030; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-weight: bold;">
+                                <ul style="margin: 0; padding-left: 20px;">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('reserve') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
+
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                                <div>
+                                    <label
+                                        style="display: block; font-weight: bold; margin-bottom: 8px; color: #4a5568; font-size: 0.9rem;">Data
+                                        Check-in</label>
+                                    <input type="date" name="check_in" id="check_in" required
+                                        style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e0; border-radius: 10px; font-size: 1rem; color: #2d3748; outline: none; transition: all 0.2s;">
+                                </div>
+                                <div>
+                                    <label
+                                        style="display: block; font-weight: bold; margin-bottom: 8px; color: #4a5568; font-size: 0.9rem;">Data
+                                        Check-out</label>
+                                    <input type="date" name="check_out" id="check_out" required
+                                        style="width: 100%; padding: 12px 15px; border: 1px solid #cbd5e0; border-radius: 10px; font-size: 1rem; color: #2d3748; outline: none; transition: all 0.2s;">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-book"
+                                style="width: 100%; padding: 15px; background-color: #3182ce; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 800; transition: all 0.2s; box-shadow: 0 4px 6px rgba(49, 130, 206, 0.3);">
+                                ✅ Conferma e Paga
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div
+                        style="text-align: center; padding: 40px; background-color: #fffaf0; color: #9c4221; border-radius: 16px; border: 2px dashed #ed8936;">
+                        <h3 style="margin-top: 0; font-size: 1.3rem;">Vuoi prenotare questo hotel?</h3>
+                        <p style="margin-bottom: 25px;">Accedi subito per selezionare le date.</p>
+
+                        <a href="{{ route('login') }}"
+                            style="background-color: #ed8936; color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1rem; transition: background 0.2s; box-shadow: 0 4px 6px rgba(237, 137, 54, 0.3);">
+                            🔐 Vai al Login
+                        </a>
+                    </div>
+                @endauth
+
+            </div>
         </div>
     </div>
+
+    <style>
+        input:focus {
+            border-color: #3182ce !important;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+        }
+
+        .btn-book:hover {
+            background-color: #2c5282 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(49, 130, 206, 0.4) !important;
+        }
+
+        a:hover {
+            color: #3182ce !important;
+        }
+    </style>
 
     <script>
         const checkInInput = document.getElementById('check_in');
