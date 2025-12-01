@@ -97,6 +97,7 @@
                                     style="background-color: #f7fafc; color: #718096; font-size: 0.85rem; text-align: left;">
                                     <th style="padding: 12px; border-radius: 8px 0 0 8px;">Hotel</th>
                                     <th style="padding: 12px;">Date</th>
+                                    <th style="padding: 12px;">Totale</th>
                                     <th style="padding: 12px; border-radius: 0 8px 8px 0;">Link</th>
                                 </tr>
                             </thead>
@@ -104,9 +105,13 @@
                                 @foreach ($reservations as $res)
                                     <tr style="border-bottom: 1px solid #eee;">
                                         <td style="padding: 15px 12px; font-weight: bold; color: #2d3748;">
-                                            {{ $res->hotel->name }}</td>
+                                            {{ $res->hotel->name }}
+                                        </td>
                                         <td style="padding: 15px 12px; font-size: 0.9rem; color: #4a5568;">
                                             {{ $res->check_in->format('d/m') }} ➝ {{ $res->check_out->format('d/m/Y') }}
+                                        </td>
+                                        <td style="padding: 15px 12px; font-weight: bold; color: #27ae60;">
+                                            € {{ $res->total_price }}
                                         </td>
                                         <td style="padding: 15px 12px;">
                                             <a href="{{ route('hotel.show', $res->hotel_id) }}"

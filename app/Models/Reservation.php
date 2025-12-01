@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reservation extends Model
 {
-    protected $fillable = ['user_id', 'hotel_id', 'check_in', 'check_out'];
+    protected $fillable = ['user_id', 'hotel_id', 'check_in', 'check_out', 'total_price'];
     protected $casts = ['check_in' => 'date', 'check_out' => 'date'];
 
     public function user()

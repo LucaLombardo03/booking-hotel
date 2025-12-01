@@ -9,18 +9,16 @@
         </div>
 
         <div class="detail-card"
-            style="background: white; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+            style="background: white; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;">
 
             <div style="padding: 40px 40px 20px 40px; border-bottom: 1px solid #edf2f7;">
                 <div
                     style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
-
                     <div style="flex: 1;">
                         <h1
                             style="font-size: 2.5rem; font-weight: 800; color: #1a202c; margin: 0; line-height: 1.1; margin-bottom: 15px;">
                             {{ $hotel->name }}
                         </h1>
-
                         <div style="color: #718096; font-size: 1.1rem; line-height: 1.6;">
                             <span
                                 style="display: inline-block; background: #ebf8ff; color: #2b6cb0; padding: 6px 14px; border-radius: 50px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
@@ -37,10 +35,9 @@
                             style="display: block; font-size: 0.85rem; text-transform: uppercase; color: #a0aec0; font-weight: bold; letter-spacing: 0.05em;">Prezzo
                             a notte</span>
                         <span style="color: #27ae60; font-weight: 900; font-size: 2rem;">€ {{ $hotel->price }}</span>
-
                         @if ($hotel->tourist_tax > 0)
                             <div style="font-size: 0.8rem; color: #718096; margin-top: 5px; font-weight: 600;">
-                                + € {{ number_format($hotel->tourist_tax, 2) }} tassa soggiorno
+                                + € {{ number_format($hotel->tourist_tax, 2) }} tassa/notte
                             </div>
                         @endif
                     </div>
@@ -116,6 +113,25 @@
                                 </div>
                             </div>
 
+                            <div id="price-summary"
+                                style="display: none; background-color: #f0fff4; border: 1px solid #c6f6d5; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span style="color: #2f855a; font-weight: bold;">Notti selezionate:</span>
+                                    <span id="total-nights" style="font-weight: bold; font-size: 1.1rem;">0</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #48bb78; paddingTop: 10px; margin-top: 10px;">
+                                    <span style="color: #2f855a; font-weight: 800; font-size: 1.2rem;">TOTALE DA
+                                        PAGARE:</span>
+                                    <span id="total-price" style="color: #2f855a; font-weight: 900; font-size: 1.5rem;">€
+                                        0.00</span>
+                                </div>
+                                <div style="font-size: 0.8rem; color: #2f855a; margin-top: 5px; text-align: right;">
+                                    (Include soggiorno + tasse)
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn-book"
                                 style="width: 100%; padding: 15px; background-color: #3182ce; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 800; transition: all 0.2s; box-shadow: 0 4px 6px rgba(49, 130, 206, 0.3);">
                                 ✅ Conferma e Paga
@@ -127,17 +143,59 @@
                         style="text-align: center; padding: 40px; background-color: #fffaf0; color: #9c4221; border-radius: 16px; border: 2px dashed #ed8936;">
                         <h3 style="margin-top: 0; font-size: 1.3rem;">Vuoi prenotare questo hotel?</h3>
                         <p style="margin-bottom: 25px;">Accedi subito per selezionare le date.</p>
-
                         <a href="{{ route('login') }}"
-                            style="background-color: #ed8936; color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1rem; transition: background 0.2s; box-shadow: 0 4px 6px rgba(237, 137, 54, 0.3);">
+                            style="background-color: #ed8936; color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1rem; transition: background 0.2s;">
                             🔐 Vai al Login
                         </a>
                     </div>
                 @endauth
-
             </div>
         </div>
     </div>
+
+    <script>
+        const checkInInput = document.getElementById('check_in');
+        const checkOutInput = document.getElementById('check_out');
+        const summaryBox = document.getElementById('price-summary');
+        const totalNightsLabel = document.getElementById('total-nights');
+        const totalPriceLabel = document.getElementById('total-price');
+
+        // Prezzi passati da PHP a JS
+        const pricePerNight = {{ $hotel->price }};
+        const touristTax = {{ $hotel->tourist_tax ?? 0 }}; // Usa 0 se null
+
+        function calculateTotal() {
+            if (checkInInput.value && checkOutInput.value) {
+                const start = new Date(checkInInput.value);
+                const end = new Date(checkOutInput.value);
+
+                // Calcola differenza in millisecondi
+                const diffTime = end - start;
+                // Converti in giorni (1000ms * 60s * 60m * 24h)
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 0) {
+                    // Calcolo: (Prezzo + Tassa) * Notti
+                    const totalCost = (pricePerNight + touristTax) * diffDays;
+
+                    // Aggiorna la grafica
+                    totalNightsLabel.innerText = diffDays;
+                    totalPriceLabel.innerText = '€ ' + totalCost.toFixed(2);
+                    summaryBox.style.display = 'block';
+                } else {
+                    summaryBox.style.display = 'none';
+                }
+            }
+        }
+
+        if (checkInInput && checkOutInput) {
+            checkInInput.addEventListener('change', function() {
+                checkOutInput.min = this.value;
+                calculateTotal();
+            });
+            checkOutInput.addEventListener('change', calculateTotal);
+        }
+    </script>
 
     <style>
         input:focus {
@@ -148,25 +206,10 @@
         .btn-book:hover {
             background-color: #2c5282 !important;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(49, 130, 206, 0.4) !important;
         }
 
         a:hover {
             color: #3182ce !important;
         }
     </style>
-
-    <script>
-        const checkInInput = document.getElementById('check_in');
-        const checkOutInput = document.getElementById('check_out');
-
-        if (checkInInput && checkOutInput) {
-            checkInInput.addEventListener('change', function() {
-                checkOutInput.min = this.value;
-                if (checkOutInput.value && checkOutInput.value < this.value) {
-                    checkOutInput.value = this.value;
-                }
-            });
-        }
-    </script>
 </x-app-layout>

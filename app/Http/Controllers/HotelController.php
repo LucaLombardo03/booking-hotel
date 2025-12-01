@@ -105,15 +105,33 @@ class HotelController extends Controller
             return back()->withErrors(['error' => 'Ci dispiace, queste date sono già occupate per questo hotel.']);
         }
 
-        // 3. Creazione prenotazione
+        // --- NUOVA PARTE: CALCOLO PREZZO ---
+
+        // A. Recupera dati Hotel
+        $hotel = Hotel::findOrFail($request->hotel_id);
+
+        // B. Calcola i giorni (usando Carbon)
+        $start = \Carbon\Carbon::parse($request->check_in);
+        $end = \Carbon\Carbon::parse($request->check_out);
+        $days = $start->diffInDays($end);
+
+        // C. Calcola Totale: (Prezzo * Giorni) + (Tassa * Giorni)
+        // Se la tassa è null, usa 0
+        $tax = $hotel->tourist_tax ?? 0;
+        $totalPrice = ($hotel->price * $days) + ($tax * $days);
+
+        // -----------------------------------
+
+        // 3. Creazione prenotazione (con il prezzo totale)
         Reservation::create([
             'user_id' => Auth::id(),
             'hotel_id' => $request->hotel_id,
             'check_in' => $request->check_in,
-            'check_out' => $request->check_out
+            'check_out' => $request->check_out,
+            'total_price' => $totalPrice // <--- SALVIAMO IL TOTALE QUI
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Prenotazione confermata!');
+        return redirect()->route('dashboard')->with('success', 'Prenotazione confermata! Totale pagato: € ' . number_format($totalPrice, 2));
     }
 
     // --- PARTE AMMINISTRATORE ---
