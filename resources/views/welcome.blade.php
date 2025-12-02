@@ -42,6 +42,30 @@
                     tutti gli hotel</a>
             </div>
         @else
+            @if (request('search'))
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #f7fafc; padding: 15px 20px; border-radius: 12px; border: 1px solid #edf2f7;">
+
+                    <div style="color: #4a5568;">
+                        Risultati per: <strong>"{{ request('search') }}"</strong>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 0.9rem; font-weight: bold; color: #718096;">Ordina Prezzo:</span>
+
+                        <a href="{{ route('home', ['search' => request('search'), 'sort' => 'price_asc']) }}"
+                            class="btn-sort {{ request('sort') == 'price_asc' ? 'active' : '' }}">
+                            ⬇️ Basso
+                        </a>
+
+                        <a href="{{ route('home', ['search' => request('search'), 'sort' => 'price_desc']) }}"
+                            class="btn-sort {{ request('sort') == 'price_desc' ? 'active' : '' }}">
+                            ⬆️ Alto
+                        </a>
+                    </div>
+                </div>
+            @endif
+
             <div class="grid"
                 style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px;">
                 @foreach ($hotels as $hotel)
@@ -132,57 +156,66 @@
             color: #3182ce !important;
         }
 
-        /* --- NUOVI STILI PER LA PAGINAZIONE --- */
+        /* --- STILI BOTTONI ORDINAMENTO --- */
+        .btn-sort {
+            text-decoration: none !important;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #4a5568 !important;
+            background-color: white;
+            border: 1px solid #cbd5e0;
+            transition: all 0.2s;
+        }
 
-        /* 1. Nasconde il testo "Showing..." */
+        .btn-sort:hover {
+            background-color: #ebf8ff;
+            border-color: #3182ce;
+            color: #2b6cb0 !important;
+        }
+
+        .btn-sort.active {
+            background-color: #3182ce;
+            color: white !important;
+            border-color: #3182ce;
+            box-shadow: 0 2px 4px rgba(49, 130, 206, 0.3);
+        }
+
+        /* --- NUOVI STILI PER LA PAGINAZIONE --- */
         nav .small.text-muted {
             display: none !important;
         }
 
-        /* 2. Centra i numeri */
         .pagination {
             justify-content: center;
             margin: 0;
-            /* Rimuove margini extra */
         }
 
-        /* 3. Stile dei link (numeri e frecce) */
         .page-link {
             color: #3182ce;
-            /* Blu del sito */
             border: none;
-            /* Nessun bordo standard */
             background-color: transparent;
             font-weight: bold;
             padding: 10px 16px;
             border-radius: 50% !important;
-            /* Cerchio perfetto */
             margin: 0 4px;
-            /* Spazio tra i cerchi */
             transition: all 0.3s ease;
         }
 
-        /* 4. Hover sui link */
         .page-link:hover {
             color: #2c5282;
-            /* Blu più scuro */
             background-color: #ebf8ff;
-            /* Sfondo azzurrino */
         }
 
-        /* 5. Stile della pagina ATTIVA */
         .page-item.active .page-link {
             background-color: #3182ce;
-            /* Sfondo blu pieno */
             color: white;
             box-shadow: 0 4px 6px rgba(49, 130, 206, 0.3);
-            /* Ombretta */
         }
 
-        /* 6. Stile per i bottoni disabilitati */
         .page-item.disabled .page-link {
             color: #a0aec0;
-            /* Grigio chiaro */
             background-color: transparent;
         }
     </style>
