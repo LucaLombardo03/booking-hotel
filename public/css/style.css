@@ -1,0 +1,175 @@
+/* --- LAYOUT GENERALE --- */
+.page-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 0;
+}
+
+.page-subtitle {
+    color: #718096;
+    margin-top: 5px;
+}
+
+/* --- ALERT E MESSAGGI --- */
+.alert-box {
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.alert-success {
+    background-color: #f0fff4;
+    color: #276749;
+    border: 1px solid #c6f6d5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.alert-error {
+    background-color: #fff5f5;
+    color: #c53030;
+    border: 1px solid #feb2b2;
+}
+
+/* --- FORM PROFILO --- */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.password-section {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.password-title {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.delete-account-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed #e2e8f0;
+}
+
+/* --- TABELLA PRENOTAZIONI --- */
+.reservations-card-header {
+    padding: 25px;
+    border-bottom: 1px solid #f1f5f9;
+    background: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #a0aec0;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.res-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.res-table thead tr {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    text-align: left;
+    letter-spacing: 0.5px;
+}
+
+.res-table th {
+    padding: 15px 25px;
+}
+
+.res-table td {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Elementi Tabella */
+.hotel-name {
+    font-weight: 800;
+    color: #2d3748;
+    font-size: 1rem;
+}
+
+.hotel-location {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-top: 4px;
+}
+
+.date-range {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.days-left-green {
+    font-size: 0.8rem;
+    color: #38a169;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.days-left-red {
+    font-size: 0.8rem;
+    color: #e53e3e;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.price-tag {
+    font-weight: 800;
+    color: #059669;
+    font-size: 1.1rem;
+}
+
+.badge-locked {
+    font-size: 0.75rem;
+    color: #cbd5e0;
+    border: 1px solid #e2e8f0;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: not-allowed;
+}
+
+/* --- STORICO PASSATO --- */
+.past-reservations-box {
+    padding: 30px;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e0;
+    opacity: 0.9;
+}
+
+.past-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+}
