@@ -14,6 +14,7 @@ class HotelController extends Controller
 {
     // --- PARTE PUBBLICA (HOME) ---
 
+    //prova
     public function index(Request $request)
     {
         $query = Hotel::query();
