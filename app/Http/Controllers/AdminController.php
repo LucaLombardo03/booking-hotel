@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+// 1. IMPORTIAMO I NUOVI FILE REQUEST
+use App\Http\Requests\StoreHotelRequest;  // <--- NUOVO
+use App\Http\Requests\UpdateHotelRequest; // <--- NUOVO
 use Illuminate\Http\Request;
 use App\Models\Hotel;
 use App\Models\HotelImage;
@@ -11,29 +14,21 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    // --- GESTIONE DASHBOARD & HOTEL ---
-
     public function index()
     {
         $hotels = Hotel::withCount('reservations')->get();
         return view('admin.home', compact('hotels'));
     }
 
-    public function storeHotel(Request $request)
+    // 2. MODIFICHIAMO QUESTO METODO
+    // Nota: Ora usa "StoreHotelRequest" invece di "Request"
+    public function storeHotel(StoreHotelRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'city' => 'required',
-            'street' => 'required',
-            'house_number' => 'required',
-            'zip_code' => 'required',
-            'price' => 'required|numeric',
-            'tourist_tax' => 'nullable|numeric|min:0',
-            'total_rooms' => 'required|integer|min:1',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
-        ]);
+        // NON serve più $request->validate([...]) qui!
+        // Se il codice arriva a questa riga, i dati sono già validi.
 
-        $hotel = Hotel::create($request->all());
+        // Usiamo $request->validated() per prendere solo i dati puliti
+        $hotel = Hotel::create($request->validated());
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
@@ -56,21 +51,13 @@ class AdminController extends Controller
         return view('admin.edit', compact('hotel'));
     }
 
-    public function updateHotel(Request $request, $id)
+    // 3. MODIFICHIAMO ANCHE QUESTO
+    // Nota: Ora usa "UpdateHotelRequest"
+    public function updateHotel(UpdateHotelRequest $request, $id)
     {
         $hotel = Hotel::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required',
-            'city' => 'required',
-            'street' => 'required',
-            'house_number' => 'required',
-            'zip_code' => 'required',
-            'price' => 'required|numeric',
-            'tourist_tax' => 'nullable|numeric|min:0',
-            'total_rooms' => 'required|integer|min:1',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
-        ]);
+        // Anche qui, via la validazione manuale.
 
         $hotel->update($request->except('images'));
 
@@ -95,7 +82,7 @@ class AdminController extends Controller
         return back()->with('success', 'Hotel rimosso');
     }
 
-    // --- GESTIONE UTENTI ---
+    // --- GESTIONE UTENTI (Resta uguale) ---
 
     public function usersIndex()
     {

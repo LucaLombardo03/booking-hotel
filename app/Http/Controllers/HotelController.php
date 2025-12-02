@@ -7,6 +7,8 @@ use App\Models\Hotel;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+// Importiamo la Request personalizzata
+use App\Http\Requests\DashboardUpdateRequest;
 
 class HotelController extends Controller
 {
@@ -69,16 +71,14 @@ class HotelController extends Controller
         return view('dashboard', compact('activeReservations', 'pastReservations'));
     }
 
-    public function updateProfile(Request $request)
+    // NOTA: Qui usiamo DashboardUpdateRequest invece di Request
+    public function updateProfile(DashboardUpdateRequest $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:8|confirmed',
-        ]);
+        // La validazione è già stata fatta automaticamente dalla classe DashboardUpdateRequest.
+        // Possiamo procedere direttamente al salvataggio.
 
         $user->name = $request->name;
         $user->email = $request->email;

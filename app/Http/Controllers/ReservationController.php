@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReservationRequest; // <--- NUOVO IMPORT
 use Illuminate\Http\Request;
 use App\Models\Reservation;
 use App\Models\Hotel;
@@ -10,17 +11,10 @@ use Carbon\Carbon;
 
 class ReservationController extends Controller
 {
-    public function store(Request $request)
+    // Nota: Ora usa "StoreReservationRequest"
+    public function store(StoreReservationRequest $request)
     {
-        // 1. Validazione
-        $request->validate([
-            'hotel_id' => 'required|exists:hotels,id',
-            'check_in' => 'required|date|after:today',
-            'check_out' => 'required|date|after:check_in',
-        ], [
-            'check_in.after' => 'Il check-in deve essere una data futura.',
-            'check_out.after' => 'La data di check-out deve essere successiva al check-in.',
-        ]);
+        // 1. VIA LA VALIDAZIONE MANUALE (è nel file Request ora)
 
         $hotel = Hotel::findOrFail($request->hotel_id);
 
