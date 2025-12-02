@@ -1,37 +1,35 @@
 <x-app-layout>
-    <div class="container" style="max-width: 600px;">
-        <div style="margin-bottom: 20px;">
-            <a href="{{ route('admin.users') }}" style="color: #3498db; text-decoration: none;">&larr; Torna alla Lista
-                Utenti</a>
+    <div class="page-container" style="max-width: 600px;">
+        <div class="page-header">
+            <h1 class="page-title">Modifica Utente</h1>
+            <a href="{{ route('admin.users') }}" class="back-link">&larr; Torna alla Lista Utenti</a>
         </div>
 
-        <div class="card">
-            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">✏️ Modifica Utente:
-                {{ $user->name }}</h3>
+        <div class="card-box">
+            <h3 class="card-title">✏️ Utente: {{ $user->name }}</h3>
 
             <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
                 <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nome</label>
-                    <input type="text" name="name" value="{{ $user->name }}" required style="width: 100%;">
+                    <label class="input-label">Nome</label>
+                    <input type="text" name="name" value="{{ $user->name }}" required class="modern-input">
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Email</label>
-                    <input type="email" name="email" value="{{ $user->email }}" required style="width: 100%;">
+                    <label class="input-label">Email</label>
+                    <input type="email" name="email" value="{{ $user->email }}" required class="modern-input">
                 </div>
 
-                <div style="margin-bottom: 20px; background: #fff3cd; padding: 15px; border-radius: 5px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #856404;">⚠️ Reset
-                        Password (Opzionale)</label>
+                <div class="alert-box" style="background: #fff3cd; border: 1px solid #ffeeba; margin-top: 20px;">
+                    <label class="input-label" style="color: #856404;">⚠️ Reset Password (Opzionale)</label>
                     <p style="font-size: 0.8em; color: #666; margin-bottom: 10px;">Inserisci una password qui sotto SOLO
                         se vuoi cambiarla all'utente. Altrimenti lascia vuoto.</p>
-                    <input type="text" name="password" placeholder="Nuova Password..." style="width: 100%;">
+                    <input type="text" name="password" placeholder="Nuova Password..." class="modern-input">
                 </div>
 
-                <button class="btn" style="background-color: #f39c12; width: 100%;">Salva Modifiche Utente</button>
+                <button class="btn-save" style="width: 100%;">Salva Modifiche Utente</button>
             </form>
         </div>
     </div>
