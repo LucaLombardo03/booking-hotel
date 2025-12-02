@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class HotelController extends Controller
 {
-    // --- PARTE PUBBLICA (HOME) ---
+    // --- PARTE PUBBLICA (HOME) --
 
     public function index(Request $request)
     {
