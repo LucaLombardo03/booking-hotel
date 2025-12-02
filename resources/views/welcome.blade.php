@@ -10,6 +10,11 @@
 
         <form action="{{ route('home') }}" method="GET"
             style="max-width: 650px; margin: 0 auto; display: flex; gap: 10px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); padding: 8px; border-radius: 50px; background: white; border: 1px solid #e2e8f0;">
+            
+            @if(request('sort'))
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+            @endif
+
             <input type="text" name="search" value="{{ request('search') }}"
                 placeholder="Cerca per nome hotel o città..."
                 style="flex: 1; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.1rem; outline: none; color: #4a5568;">
@@ -42,9 +47,10 @@
                     tutti gli hotel</a>
             </div>
         @else
+            
             @if (request('search'))
                 <div
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #f7fafc; padding: 15px 20px; border-radius: 12px; border: 1px solid #edf2f7;">
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #f7fafc; padding: 15px 20px; border-radius: 12px; border: 1px solid #edf2f7; flex-wrap: wrap; gap: 10px;">
 
                     <div style="color: #4a5568;">
                         Risultati per: <strong>"{{ request('search') }}"</strong>
@@ -72,17 +78,39 @@
                     <div class="hotel-card"
                         style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid #edf2f7; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease;">
 
-                        <div style="padding: 30px;">
+                        <div style="height: 220px; overflow: hidden; background: #f7fafc; border-bottom: 1px solid #edf2f7; position: relative;">
+                            @if($hotel->relationLoaded('images') && $hotel->images->count() > 0)
+                                <img src="{{ asset($hotel->images->first()->image_path) }}" 
+                                     alt="{{ $hotel->name }}" 
+                                     style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;" 
+                                     onmouseover="this.style.transform='scale(1.05)'" 
+                                     onmouseout="this.style.transform='scale(1)'">
+                            @else
+                                <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #a0aec0; font-weight: bold; flex-direction: column;">
+                                    <span style="font-size: 2rem; margin-bottom: 5px;">📷</span>
+                                    <span>No Foto</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div style="padding: 25px;">
                             <div style="margin-bottom: 15px;">
                                 <h3
                                     style="font-size: 1.6rem; font-weight: 800; color: #2d3748; margin: 0; line-height: 1.2; margin-bottom: 10px;">
                                     {{ $hotel->name }}
                                 </h3>
 
-                                <span
-                                    style="display: inline-block; background: #ebf8ff; color: #2b6cb0; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
-                                    {{ $hotel->city }}
-                                </span>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <span
+                                        style="display: inline-block; background: #ebf8ff; color: #2b6cb0; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        {{ $hotel->city }}
+                                    </span>
+                                    
+                                    <span
+                                        style="display: inline-block; background: #e6fffa; color: #285e61; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;">
+                                        🏠 {{ $hotel->total_rooms ?? 1 }} Stanze
+                                    </span>
+                                </div>
                             </div>
 
                             <div style="color: #718096; font-size: 1rem; line-height: 1.6;">
@@ -182,7 +210,7 @@
             box-shadow: 0 2px 4px rgba(49, 130, 206, 0.3);
         }
 
-        /* --- NUOVI STILI PER LA PAGINAZIONE --- */
+        /* --- STILI PAGINAZIONE --- */
         nav .small.text-muted {
             display: none !important;
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Hotel;
+use App\Models\HotelImage; // <--- AGGIUNTO
 use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class HotelController extends Controller
 {
-    // --- PARTE PUBBLICA (HOME) --
+    // --- PARTE PUBBLICA (HOME) ---
 
     public function index(Request $request)
     {
@@ -21,8 +22,6 @@ class HotelController extends Controller
         // 1. Logica di Ricerca
         if ($request->has('search') && $request->search != '') {
             $s = $request->get('search');
-
-            // Filtra per nome o città
             $query->where(function ($q) use ($s) {
                 $q->where('name', 'LIKE', "%{$s}%")
                     ->orWhere('city', 'LIKE', "%{$s}%");
@@ -30,26 +29,28 @@ class HotelController extends Controller
         }
 
         // 2. Logica di Ordinamento (FILTRI PREZZO)
-        // Questo è il pezzo che mancava per ordinare
         if ($request->has('sort')) {
             if ($request->sort == 'price_asc') {
-                $query->orderBy('price', 'asc'); // Prezzo Crescente
+                $query->orderBy('price', 'asc');
             } elseif ($request->sort == 'price_desc') {
-                $query->orderBy('price', 'desc'); // Prezzo Decrescente
+                $query->orderBy('price', 'desc');
             }
         }
 
-        // Paginazione
-        $hotels = $query->paginate(6);
+        // Paginazione + CARICAMENTO IMMAGINI (with images)
+        $hotels = $query->with('images')->paginate(6);
 
         return view('welcome', compact('hotels'));
     }
 
     public function show($id)
     {
-        $hotel = Hotel::findOrFail($id);
+        // Carica hotel con le immagini
+        $hotel = Hotel::with('images')->findOrFail($id);
 
         // Recupera le date già prenotate (future)
+        // Nota: In un sistema reale mostreremmo le date solo se l'hotel è PIENO.
+        // Qui passiamo comunque le prenotazioni per mostrarle nel calendario se serve.
         $bookedDates = Reservation::where('hotel_id', $id)
             ->where('check_out', '>=', now())
             ->orderBy('check_in')
@@ -65,13 +66,11 @@ class HotelController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Recupera TUTTE le prenotazioni dell'utente
         $allReservations = Reservation::where('user_id', $user->id)
             ->with('hotel')
-            ->orderBy('check_in', 'asc') // Ordine cronologico
+            ->orderBy('check_in', 'asc')
             ->get();
 
-        // Separa in due gruppi: Future e Passate
         $activeReservations = $allReservations->where('check_out', '>=', now()->startOfDay());
         $pastReservations = $allReservations->where('check_out', '<', now()->startOfDay())->sortByDesc('check_in');
 
@@ -102,23 +101,20 @@ class HotelController extends Controller
         return back()->with('success', 'Profilo aggiornato con successo!');
     }
 
-    // Cancellazione Account (Utente si cancella da solo)
+    // Cancellazione Account
     public function destroyProfile(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-
-        Auth::logout(); // Logout prima di cancellare
-
-        $user->delete(); // Cancella utente (e prenotazioni a cascata)
-
+        Auth::logout();
+        $user->delete();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'Il tuo account è stato eliminato.');
     }
 
-    // Salva Prenotazione
+    // --- LOGICA PRENOTAZIONE (ROOM INVENTORY) ---
     public function storeReservation(Request $request)
     {
         // 1. Validazione
@@ -131,20 +127,23 @@ class HotelController extends Controller
             'check_out.after' => 'La data di check-out deve essere successiva al check-in.',
         ]);
 
-        // 2. Controllo sovrapposizione
-        $exists = Reservation::where('hotel_id', $request->hotel_id)
+        $hotel = Hotel::findOrFail($request->hotel_id);
+
+        // 2. CONTROLLO DISPONIBILITÀ (Logica Stanze)
+        // Contiamo quante prenotazioni si sovrappongono alle date richieste
+        $overlappingCount = Reservation::where('hotel_id', $hotel->id)
             ->where(function ($query) use ($request) {
                 $query->where('check_in', '<', $request->check_out)
-                    ->where('check_out', '>', $request->check_in);
+                      ->where('check_out', '>', $request->check_in);
             })
-            ->exists();
+            ->count();
 
-        if ($exists) {
-            return back()->withErrors(['error' => 'Ci dispiace, queste date sono già occupate per questo hotel.']);
+        // Se le prenotazioni attive sono >= alle stanze totali -> ERRORE
+        if ($overlappingCount >= $hotel->total_rooms) {
+            return back()->withErrors(['error' => "Siamo spiacenti, l'hotel è al completo per queste date. (Stanze occupate: {$overlappingCount}/{$hotel->total_rooms})"]);
         }
 
         // 3. Calcolo Totale
-        $hotel = Hotel::findOrFail($request->hotel_id);
         $start = \Carbon\Carbon::parse($request->check_in);
         $end = \Carbon\Carbon::parse($request->check_out);
         $days = $start->diffInDays($end);
@@ -164,7 +163,6 @@ class HotelController extends Controller
         return redirect()->route('dashboard')->with('success', 'Prenotazione confermata! Totale: € ' . number_format($totalPrice, 2));
     }
 
-    // Cancella Prenotazione (Controllo 24 ore)
     public function cancelReservation($id)
     {
         $reservation = Reservation::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
@@ -176,7 +174,6 @@ class HotelController extends Controller
         }
 
         $reservation->delete();
-
         return back()->with('success', 'Prenotazione cancellata correttamente.');
     }
 
@@ -188,6 +185,7 @@ class HotelController extends Controller
         return view('admin.home', compact('hotels'));
     }
 
+    // CREAZIONE HOTEL (Con Immagini)
     public function storeHotel(Request $request)
     {
         $request->validate([
@@ -197,19 +195,38 @@ class HotelController extends Controller
             'house_number' => 'required',
             'zip_code' => 'required',
             'price' => 'required|numeric',
-            'tourist_tax' => 'nullable|numeric|min:0'
+            'tourist_tax' => 'nullable|numeric|min:0',
+            'total_rooms' => 'required|integer|min:1', // Validazione stanze
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048' // Validazione immagini
         ]);
 
-        Hotel::create($request->all());
-        return back()->with('success', 'Hotel aggiunto');
+        // Crea l'hotel
+        $hotel = Hotel::create($request->all());
+
+        // Carica le immagini se presenti
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads'), $filename);
+
+                HotelImage::create([
+                    'hotel_id' => $hotel->id,
+                    'image_path' => 'uploads/' . $filename
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Hotel aggiunto con successo!');
     }
 
     public function edit($id)
     {
-        $hotel = Hotel::findOrFail($id);
+        // Carica immagini anche qui per vederle nella modifica
+        $hotel = Hotel::with('images')->findOrFail($id);
         return view('admin.edit', compact('hotel'));
     }
 
+    // MODIFICA HOTEL (Con aggiunta Immagini)
     public function update(Request $request, $id)
     {
         $hotel = Hotel::findOrFail($id);
@@ -221,11 +238,28 @@ class HotelController extends Controller
             'house_number' => 'required',
             'zip_code' => 'required',
             'price' => 'required|numeric',
-            'tourist_tax' => 'nullable|numeric|min:0'
+            'tourist_tax' => 'nullable|numeric|min:0',
+            'total_rooms' => 'required|integer|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $hotel->update($request->all());
-        return redirect()->route('admin.home')->with('success', 'Hotel modificato!');
+        // Aggiorna tutti i campi tranne le immagini (che gestiamo a mano)
+        $hotel->update($request->except('images'));
+
+        // Se ci sono NUOVE immagini, le aggiungiamo a quelle esistenti
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads'), $filename);
+
+                HotelImage::create([
+                    'hotel_id' => $hotel->id,
+                    'image_path' => 'uploads/' . $filename
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.home')->with('success', 'Hotel modificato con successo!');
     }
 
     public function deleteHotel($id)

@@ -12,15 +12,46 @@
         <div class="admin-card">
             <h3 class="card-title">✏️ Modifica Dati: <span style="color: #3182ce;">{{ $hotel->name }}</span></h3>
 
-            <form action="{{ route('admin.hotel.update', $hotel->id) }}" method="POST">
+            <form action="{{ route('admin.hotel.update', $hotel->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div style="margin-bottom: 30px; border-bottom: 1px solid #edf2f7; padding-bottom: 20px;">
+                    <label class="input-label" style="margin-bottom: 15px;">🖼️ Gestione Foto</label>
+
+                    @if($hotel->images->count() > 0)
+                        <div style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 10px;">
+                            @foreach($hotel->images as $img)
+                                <img src="{{ asset($img->image_path) }}" 
+                                     style="width: 100px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            @endforeach
+                        </div>
+                    @else
+                        <p style="color: #a0aec0; font-size: 0.9rem; margin-bottom: 15px;">Nessuna foto caricata.</p>
+                    @endif
+
+                    <div style="border: 2px dashed #cbd5e0; background: #f7fafc; padding: 15px; border-radius: 8px;">
+                        <label class="input-label" style="margin-bottom: 5px; color: #4a5568;">➕ Aggiungi altre foto</label>
+                        <input type="file" name="images[]" multiple accept="image/*" class="modern-input" 
+                               style="border: none; background: transparent; padding: 0;">
+                        <p style="font-size: 0.8rem; color: #718096; margin-top: 5px;">
+                            Le nuove immagini verranno aggiunte a quelle esistenti.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label class="input-label">Nome Hotel</label>
                         <input type="text" name="name" value="{{ $hotel->name }}" required class="modern-input">
                     </div>
+                    <div>
+                        <label class="input-label">N. Stanze</label>
+                        <input type="number" name="total_rooms" value="{{ $hotel->total_rooms }}" required class="modern-input" min="1">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label class="input-label">Prezzo (€)</label>
                         <input type="number" name="price" value="{{ $hotel->price }}" required class="modern-input">
@@ -101,8 +132,6 @@
             border-color: #f6ad55;
             box-shadow: 0 0 0 3px rgba(246, 173, 85, 0.2);
         }
-
-        /* Focus arancione per la modifica */
 
         .input-label {
             display: block;

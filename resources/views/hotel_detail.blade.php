@@ -11,6 +11,17 @@
         <div class="detail-card"
             style="background: white; border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden;">
 
+            @if($hotel->images->count() > 0)
+                <div class="carousel" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 400px; border-bottom: 1px solid #edf2f7;">
+                    @foreach($hotel->images as $img)
+                        <img src="{{ asset($img->image_path) }}" alt="{{ $hotel->name }}" 
+                             style="min-width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start;">
+                    @endforeach
+                </div>
+                <p style="text-align: center; color: #a0aec0; font-size: 0.8rem; margin: 5px 0 0 0;">
+                    (Scorri orizzontalmente per vedere le altre foto)
+                </p>
+            @endif
             <div style="padding: 40px 40px 20px 40px; border-bottom: 1px solid #edf2f7;">
                 <div
                     style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
@@ -20,9 +31,15 @@
                             {{ $hotel->name }}
                         </h1>
                         <div style="color: #718096; font-size: 1.1rem; line-height: 1.6;">
+                            
                             <span
                                 style="display: inline-block; background: #ebf8ff; color: #2b6cb0; padding: 6px 14px; border-radius: 50px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
                                 {{ $hotel->city }}
+                            </span>
+
+                            <span 
+                                style="display: inline-block; background: #e6fffa; color: #285e61; padding: 6px 14px; border-radius: 50px; font-size: 0.9rem; font-weight: bold; margin-left: 8px; margin-bottom: 10px;">
+                                🏠 {{ $hotel->total_rooms }} Stanze
                             </span>
                             <br>
                             📍 {{ $hotel->street }}, {{ $hotel->house_number }} <span style="color: #a0aec0;">—
@@ -211,5 +228,8 @@
         a:hover {
             color: #3182ce !important;
         }
+
+        /* Nasconde la scrollbar del carosello */
+        .carousel::-webkit-scrollbar { display: none; }
     </style>
 </x-app-layout>

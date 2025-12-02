@@ -4,33 +4,64 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
             <div>
                 <h1 style="font-size: 2rem; font-weight: 800; color: #1a202c; margin: 0;">Dashboard Admin</h1>
-                <p style="color: #718096; margin-top: 5px;">Gestisci strutture e contenuti.</p>
+                <p style="color: #718096; margin-top: 5px;">Gestisci strutture, stanze e prenotazioni.</p>
             </div>
             <a href="{{ route('admin.users') }}" class="btn-secondary">
                 👥 Gestisci Utenti
             </a>
         </div>
 
+        @if(session('success'))
+            <div style="background:#c6f6d5; color:#22543d; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #9ae6b4;">
+                ✅ {{ session('success') }}
+            </div>
+        @endif
+        @if($errors->any())
+            <div style="background:#fed7d7; color:#822727; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #feb2b2;">
+                <ul>@foreach($errors->all() as $error) <li>❌ {{ $error }}</li> @endforeach</ul>
+            </div>
+        @endif
+
         <div class="admin-card" style="margin-bottom: 40px;">
             <h3 class="card-title">🏨 Aggiungi Nuovo Hotel</h3>
 
-            <form action="{{ route('admin.hotel.store') }}" method="POST">
+            <form action="{{ route('admin.hotel.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+
+                <div style="margin-bottom: 25px;">
+                    <label class="input-label">📸 Foto Hotel (Seleziona più file)</label>
+                    <div style="border: 2px dashed #e2e8f0; background: #f7fafc; padding: 15px; border-radius: 8px;">
+                        <input type="file" name="images[]" multiple accept="image/*" class="modern-input" style="border: none; background: transparent;">
+                    </div>
+                </div>
 
                 <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                     <div>
                         <label class="input-label">Nome Hotel</label>
-                        <input type="text" name="name" placeholder="Es. Grand Hotel" required
-                            class="modern-input">
+                        <input type="text" name="name" placeholder="Es. Grand Hotel" required class="modern-input">
+                    </div>
+                    <div>
+                        <label class="input-label">N. Stanze</label>
+                        <input type="number" name="total_rooms" placeholder="Es. 10" required class="modern-input" min="1">
                     </div>
                     <div>
                         <label class="input-label">Prezzo (€)</label>
                         <input type="number" name="price" placeholder="Es. 120" required class="modern-input">
                     </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label class="input-label">Città</label>
+                        <input type="text" name="city" placeholder="Milano" required class="modern-input">
+                    </div>
+                    <div>
+                        <label class="input-label">CAP</label>
+                        <input type="text" name="zip_code" placeholder="20100" required class="modern-input">
+                    </div>
                     <div>
                         <label class="input-label">Tassa Soggiorno (€)</label>
-                        <input type="number" step="0.50" name="tourist_tax" placeholder="Es. 2.50"
-                            class="modern-input">
+                        <input type="number" step="0.50" name="tourist_tax" placeholder="Es. 2.50" class="modern-input">
                     </div>
                 </div>
 
@@ -42,17 +73,6 @@
                     <div>
                         <label class="input-label">N. Civico</label>
                         <input type="text" name="house_number" placeholder="10" required class="modern-input">
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
-                    <div>
-                        <label class="input-label">Città</label>
-                        <input type="text" name="city" placeholder="Milano" required class="modern-input">
-                    </div>
-                    <div>
-                        <label class="input-label">CAP</label>
-                        <input type="text" name="zip_code" placeholder="20100" required class="modern-input">
                     </div>
                 </div>
 
@@ -86,14 +106,19 @@
                     <tbody>
                         @foreach ($hotels as $hotel)
                             <tr>
-                                <td style="font-weight: bold; color: #2d3748;">{{ $hotel->name }}</td>
+                                <td style="font-weight: bold; color: #2d3748;">
+                                    {{ $hotel->name }}
+                                    <div style="font-weight: normal; font-size: 0.8rem; color: #718096; margin-top: 2px;">
+                                        🏠 {{ $hotel->total_rooms }} Stanze
+                                    </div>
+                                </td>
                                 <td style="color: #718096;">
                                     {{ $hotel->city }} <span style="font-size: 0.8em;">({{ $hotel->street }})</span>
                                 </td>
                                 <td>
                                     <span
                                         style="background: #ebf8ff; color: #2b6cb0; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
-                                        {{ $hotel->reservations_count }}
+                                        {{ $hotel->reservations_count }} attive
                                     </span>
                                 </td>
                                 <td style="text-align: right;">
