@@ -8,6 +8,7 @@ use App\Http\Controllers\ReservationController; // <--- NUOVO
 // 1. HOME E DETTAGLI (Pubbliche)
 Route::get('/', [HotelController::class, 'index'])->name('home');
 Route::get('/hotel/{id}', [HotelController::class, 'show'])->name('hotel.show');
+Route::get('/check-availability', [HotelController::class, 'checkAvailability'])->name('api.check_availability');
 
 // 2. AUTH (Login/Register)
 require __DIR__ . '/auth.php';

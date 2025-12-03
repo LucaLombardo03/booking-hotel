@@ -119,9 +119,9 @@
                                             </td>
 
                                             <td style="padding: 20px 15px;">
-                                                <span class="price-tag">
-                                                    €
-                                                    {{ number_format($res->total_price ?? $res->hotel->price * $res->check_in->diffInDays($res->check_out), 2) }}
+                                                {{-- Aggiunto style="white-space: nowrap;" per impedire l'a capo --}}
+                                                <span class="price-tag" style="white-space: nowrap;">
+                                                    €&nbsp;{{ number_format($res->total_price ?? $res->hotel->price * $res->check_in->diffInDays($res->check_out), 2) }}
                                                 </span>
                                             </td>
 

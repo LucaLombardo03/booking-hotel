@@ -104,4 +104,30 @@ class HotelController extends Controller
 
         return redirect('/')->with('success', 'Il tuo account è stato eliminato.');
     }
+
+    public function checkAvailability(Request $request)
+    {
+        $hotelId = $request->input('hotel_id');
+        $checkIn = $request->input('check_in');
+        $checkOut = $request->input('check_out');
+
+        $hotel = Hotel::findOrFail($hotelId);
+
+        // Contiamo quante prenotazioni si sovrappongono alle date scelte
+        $overlappingReservations = Reservation::where('hotel_id', $hotelId)
+            ->where(function ($query) use ($checkIn, $checkOut) {
+                $query->where('check_in', '<', $checkOut)
+                    ->where('check_out', '>', $checkIn);
+            })
+            ->count();
+
+        // Stanze rimanenti = Totale Stanze - Prenotazioni sovrapposte
+        $remainingRooms = $hotel->total_rooms - $overlappingReservations;
+
+        // Non ritorniamo mai meno di 0
+        return response()->json([
+            'rooms_left' => max($remainingRooms, 0),
+            'total_rooms' => $hotel->total_rooms
+        ]);
+    }
 }
