@@ -41,7 +41,7 @@
 
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}"
-                            style="color: #3182ce; font-size: 0.9rem; font-weight: bold; text-decoration: none; transition: color 0.2s;">
+                            style="text-align: right; color: #3182ce; font-size: 0.9rem; font-weight: bold; text-decoration: none; transition: color 0.2s;">
                             Password dimenticata?
                         </a>
                     @endif
